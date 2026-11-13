@@ -64,7 +64,7 @@ def pin_texts(item, pages):
     elif kind == "verse":
         t_en, t_de = f"Bhagavad Gita {item['ref']} Meaning: Sanskrit Verse with English Translation", f"Bhagavad Gita {item['ref']} Bedeutung: Sanskrit-Vers mit deutscher Übersetzung"
     else:
-        t_en, t_de = f"{item['hook']} Vedanta Simply Explained", f"{item['hook_de']} Vedanta einfach erklärt"
+        t_en, t_de = f"Vedanta Simply Explained: {item['hook']}", f"Vedanta einfach erklärt: {item['hook_de']}"
     d_en = f"{first_sentence(item['cap_en'])} {LINE_EN[kind]} Read the full guide: {title_en_article}.\n\n{tags}"
     d_de = f"{first_sentence(item['cap_de'])} {LINE_DE[kind]} Zum ganzen Artikel auf kirtantutorials.com.\n\n{tags}"
     return dict(title_en=t_en, title_de=t_de, desc_en=d_en, desc_de=d_de, link_en=link_en, link_de=link_de,
