@@ -81,6 +81,14 @@ STYLES = {
     "body": ("lora", 43, "Regular", 69),
 }
 
+def table_right_lines(draw, left, right):
+    """Wrap the right column of a table row. If the left word leaves too little room, put it on its own line below."""
+    left_font, right_font = font("cormorant", 60, "Italic"), font("lora", 39, "Regular")
+    room = TEXT_WIDTH - draw.textlength(left, font=left_font) - 40
+    if room >= 300 or room >= draw.textlength(right, font=right_font):
+        return wrap(draw, right, right_font, room), False
+    return wrap(draw, right, right_font, TEXT_WIDTH), True
+
 def render_slide(slide, page=None, pages=None):
     bg = slide["bg"]
     c = colors(bg)
@@ -107,7 +115,9 @@ def render_slide(slide, page=None, pages=None):
             y += 14; ops.append(("rule", y)); y += 34; continue
         if kind == "table":
             for left, right in block[1]:
-                ops.append(("row", y, left, right)); y += 96
+                lines, below = table_right_lines(draw, left, right)
+                ops.append(("row", y, left, lines, below))
+                y += 96 + 44 * (len(lines) - 1) + (56 if below else 0)
             continue
         style = kind
         if kind == "deva" and len(block[1]) > 14:
@@ -128,11 +138,11 @@ def render_slide(slide, page=None, pages=None):
         if op[0] == "rule":
             draw.line([(LEFT, top + op[1]), (RIGHT, top + op[1])], fill=c["rule"], width=2)
         elif op[0] == "row":
-            _, oy, left, right = op
+            _, oy, left, right_lines, below = op
             draw.text((LEFT, top + oy), left, font=row_left_font, fill=c["table_left"])
-            right_lines = wrap(draw, right, row_right_font, TEXT_WIDTH - draw.textlength(left, font=row_left_font) - 40)
+            start = oy + (70 if below else 14)
             for k, rl in enumerate(right_lines):
-                draw.text((RIGHT, top + oy + 14 + k * 44), rl, font=row_right_font, fill=c["table_right"], anchor="ra")
+                draw.text((RIGHT, top + start + k * 44), rl, font=row_right_font, fill=c["table_right"], anchor="ra")
         else:
             _, oy, line, fnt, color = op
             if center:
